@@ -15,6 +15,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.fxb.shipper.myapplication.config.RequestConfig;
 import com.fxb.shipper.myapplication.util.Sp;
 import com.fxb.shipper.myapplication.util.ToastUtil;
 
@@ -84,8 +85,7 @@ public class SelectShipperActivity extends Activity {
     }
 
     public void getShipper() {
-        String url = "http://39.108.0.144/YJYNLogisticsSystem/appPublishInformation?action=getShipperList";
-        StringRequest getContactRequest = new StringRequest(url, new Response.Listener<String>() {
+        StringRequest getContactRequest = new StringRequest(RequestConfig.getShipperList, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 if (TextUtils.isEmpty(s)) {

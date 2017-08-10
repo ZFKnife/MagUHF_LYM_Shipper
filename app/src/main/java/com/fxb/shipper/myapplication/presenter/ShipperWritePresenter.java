@@ -7,6 +7,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.fxb.shipper.myapplication.application.App;
+import com.fxb.shipper.myapplication.config.RequestConfig;
 import com.fxb.shipper.myapplication.util.Sp;
 import com.fxb.shipper.myapplication.util.Util;
 import com.fxb.shipper.myapplication.view.IShipperWriteView;
@@ -112,8 +113,7 @@ public class ShipperWritePresenter extends Presenter {
         if (strings == null) {
             return;
         }
-        String url = "http://39.108.0.144/YJYNLogisticsSystem/appPublishInformation?action=getRealordShipper&";
-        StringBuilder stringBuilder = new StringBuilder(url);
+        StringBuilder stringBuilder = new StringBuilder(RequestConfig.getRealordShipper);
         stringBuilder.append("&CARNUM=").append(carnum);
         StringRequest getContactRequest = new StringRequest(stringBuilder.toString(), new Response.Listener<String>() {
             @Override
@@ -166,8 +166,7 @@ public class ShipperWritePresenter extends Presenter {
             * SHIPPERPI：发货端皮重
             * SHIPPERJING：发货端净重
             * */
-        String Shipperurl = "http://39.108.0.144/YJYNLogisticsSystem/appPublishInformation?action=upShipperMeasData&";
-        StringBuilder stringBuilder = new StringBuilder(Shipperurl);
+        StringBuilder stringBuilder = new StringBuilder(RequestConfig.upShipperMeasData);
         stringBuilder.append("CARDNUM=").append(strings[0]);
         stringBuilder.append("&CARNUM=").append(carnum);
         stringBuilder.append("&SHIPPERMAO=").append(maoWeight);
@@ -189,8 +188,7 @@ public class ShipperWritePresenter extends Presenter {
                                 @Override
                                 public void run() {
                                     //上传发货方图片
-                                    String uploadShipperurl = "";
-                                    uploadShipperServer(uploadShipperurl, carnum, getBitmapPath(), imageBitmap);
+                                    uploadShipperServer(RequestConfig.uploadShipperurl, carnum, getBitmapPath(), imageBitmap);
                                 }
                             }).start();
                         }
