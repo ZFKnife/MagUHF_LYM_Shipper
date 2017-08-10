@@ -13,16 +13,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fxb.shipper.myapplication.presenter.ShipperPresenter;
+import com.fxb.shipper.myapplication.presenter.ShipperWritePresenter;
 import com.fxb.shipper.myapplication.util.Sp;
-import com.fxb.shipper.myapplication.view.IShipperView;
+import com.fxb.shipper.myapplication.view.IShipperWriteView;
 
 
 /**
  * Created by dxl on 2017-06-24.
  */
 
-public class ShipperWriteActivity extends Activity implements IShipperView {
+public class ShipperWriteActivity extends Activity implements IShipperWriteView {
     private static final String TAG = "ShipperWriteActivity";
 
 
@@ -38,7 +38,7 @@ public class ShipperWriteActivity extends Activity implements IShipperView {
     private Button btn_shipperWritting;
 
 
-    private ShipperPresenter presenter = null;
+    private ShipperWritePresenter presenter = null;
 
 
     private ImageView imageView;
@@ -51,7 +51,7 @@ public class ShipperWriteActivity extends Activity implements IShipperView {
 
         setContentView(R.layout.activity_shipper_write);
         initView();
-        presenter = new ShipperPresenter(this);
+        presenter = new ShipperWritePresenter(this);
         onClick();
     }
 

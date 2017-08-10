@@ -4,7 +4,7 @@ package com.fxb.shipper.myapplication.view;
  * Created by Administrator on 2017/8/9 0009.
  */
 
-public interface IShipperView extends IUHFViewBase {
+public interface IShipperWriteView extends IUHFViewBase {
     /**
      * 获取皮重
      *
