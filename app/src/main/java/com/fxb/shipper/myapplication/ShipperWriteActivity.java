@@ -52,6 +52,9 @@ public class ShipperWriteActivity extends Activity implements IShipperWriteView 
         setContentView(R.layout.activity_shipper_write);
         initView();
         presenter = new ShipperWritePresenter(this);
+
+        presenter.setEPCtext();
+
         onClick();
     }
 
