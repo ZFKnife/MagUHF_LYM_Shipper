@@ -6,9 +6,10 @@ import android.text.TextUtils;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.fxb.shipper.application.App;
-import com.fxb.shipper.util.Util;
-import com.fxb.shipper.view.IShipperView;
+import com.fxb.shipper.myapplication.application.App;
+import com.fxb.shipper.myapplication.util.Sp;
+import com.fxb.shipper.myapplication.util.Util;
+import com.fxb.shipper.myapplication.view.IShipperWriteView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,15 +20,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.DecimalFormat;
 
 /**
  * Created by Administrator on 2017/8/9 0009.
  */
 
-public class ShipperPresenter extends Presenter {
+public class ShipperWritePresenter extends Presenter {
 
-    private IShipperView iShipperView;
+    private IShipperWriteView iShipperWriteView;
 
     private String[] strings;
 
@@ -39,9 +41,11 @@ public class ShipperPresenter extends Presenter {
 
     private String shipperjing;
 
-    public ShipperPresenter(IShipperView iShipperView) {
-        super(iShipperView);
-        this.iShipperView = iShipperView;
+    private String carnum = null;
+
+    public ShipperWritePresenter(IShipperWriteView iShipperWriteView) {
+        super(iShipperWriteView);
+        this.iShipperWriteView = iShipperWriteView;
     }
 
     public void readCarNum() {
@@ -49,47 +53,55 @@ public class ShipperPresenter extends Presenter {
     }
 
     public void writeShipper() {
-        shipperPi = iShipperView.getShipperPI();
+        shipperPi = iShipperWriteView.getShipperPI();
         StringBuilder sb = new StringBuilder();
         if (shipperPi.equals("")) {
-            iShipperView.showToast("发货皮重不可以为空");
+            iShipperWriteView.showToast("发货皮重不可以为空");
             return;
         }
-        shipperMao = iShipperView.getShipperMao();
+        shipperMao = iShipperWriteView.getShipperMao();
         if (shipperMao.equals("")) {
-            iShipperView.showToast("发货毛重不可以为空");
+            iShipperWriteView.showToast("发货毛重不可以为空");
             return;
         }
         if (strings == null || strings.length == 0) {
-            iShipperView.showToast("车牌号不能为空,请先读卡");
+            iShipperWriteView.showToast("车牌号不能为空,请先读卡");
             return;
         }
         Double d_rough_weight = Double.parseDouble(shipperMao);
         Double d_tare = Double.parseDouble(shipperPi);
         double d_weight_empty = d_rough_weight - d_tare;
         DecimalFormat df = new DecimalFormat("#.00");
+        shipperMao = df.format(d_rough_weight);
+        shipperPi = df.format(d_tare);
         shipperjing = df.format(d_weight_empty);
         sb.append(strings[0]).append(",");
         sb.append(strings[1]).append(",");
         sb.append(shipperMao).append(",");
         sb.append(shipperPi).append(",");
         sb.append(shipperjing).append(",");
-        iShipperView.setShipperJingText(shipperjing);
-        writeTrue(sb.toString());
+        sb.append(Sp.getStrings(App.mContext, "name")).append(",");
+        iShipperWriteView.setShipperJingText(shipperjing);
+//        writeTrue(sb.toString());
+        //上传发货方信息 上传成功后写卡
+        upShipperMeadData(shipperMao, shipperPi, shipperjing, sb.toString());
     }
 
     @Override
     void readResponse(String str) {
         strings = str.split(",");
-        iShipperView.showToast("读取成功！");
-        iShipperView.setCarNumText(strings[1]);
+        iShipperWriteView.showToast("读取成功！");
+        iShipperWriteView.setCarNumText(strings[1]);
+        carnum = URLEncoder.encode(strings[1].substring(0, 1)) + strings[1].substring(1);
+        iShipperWriteView.setResult(str);
+
         contrastShipper();
     }
 
     @Override
     void writeResponse() {
-        iShipperView.showToast("写入成功！");
-        upShipperMeadData(shipperMao,shipperPi,shipperjing);
+        iShipperWriteView.showToast("写入成功！");
+        iShipperWriteView.setResult("完成");
     }
 
 
@@ -102,7 +114,7 @@ public class ShipperPresenter extends Presenter {
         }
         String url = "http://39.108.0.144/YJYNLogisticsSystem/appPublishInformation?action=getRealordShipper&";
         StringBuilder stringBuilder = new StringBuilder(url);
-        stringBuilder.append("&CARNUM=").append(strings[1]);
+        stringBuilder.append("&CARNUM=").append(carnum);
         StringRequest getContactRequest = new StringRequest(stringBuilder.toString(), new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
@@ -112,17 +124,17 @@ public class ShipperPresenter extends Presenter {
                 try {
                     JSONObject o = new JSONObject(s);
                     if (o.getString("status").equals("0")) {
-                        String localname = iShipperView.getLocalhostName();
+                        String localname = iShipperWriteView.getLocalhostName();
                         String intentname = o.getString("name");
                         if (!localname.equals(intentname)) {
-                            iShipperView.showToast("所在发货商和订单发货商不符！");
-                            iShipperView.finash();
+                            iShipperWriteView.showToast("所在发货商和订单发货商不符！");
+                            iShipperWriteView.finash();
                         } else {
-                            iShipperView.showToast("通过！");
+                            iShipperWriteView.showToast("通过！");
                         }
                     } else if (o.getString("status").equals("1")) {
-                        iShipperView.showToast("请确认是否接单！");
-                        iShipperView.finash();
+                        iShipperWriteView.showToast("请确认是否接单！");
+                        iShipperWriteView.finash();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -140,7 +152,7 @@ public class ShipperPresenter extends Presenter {
     /**
      * 上传发货方信息
      */
-    private void upShipperMeadData(String maoWeight, String piWeight, String jingWeight) {
+    private void upShipperMeadData(String maoWeight, String piWeight, String jingWeight, final String sb) {
         //上传计量数据
             /*
             * 参数说明
@@ -157,7 +169,7 @@ public class ShipperPresenter extends Presenter {
         String Shipperurl = "http://39.108.0.144/YJYNLogisticsSystem/appPublishInformation?action=upShipperMeasData&";
         StringBuilder stringBuilder = new StringBuilder(Shipperurl);
         stringBuilder.append("CARDNUM=").append(strings[0]);
-        stringBuilder.append("&CARNUM=").append(strings[1]);
+        stringBuilder.append("&CARNUM=").append(carnum);
         stringBuilder.append("&SHIPPERMAO=").append(maoWeight);
         stringBuilder.append("&SHIPPERPI=").append(piWeight);
         stringBuilder.append("&SHIPPERJING=").append(jingWeight);
@@ -165,26 +177,25 @@ public class ShipperPresenter extends Presenter {
             @Override
             public void onResponse(String s) {
                 if (TextUtils.isEmpty(s)) {
-                    iShipperView.showToast("服务器数据异常");
-
+                    iShipperWriteView.showToast("服务器数据异常");
                     return;
                 }
                 try {
                     JSONObject o = new JSONObject(s);
                     if (o.getString("status").equals("0")) {
-
+                        writeTrue(sb);
                         if (imageBitmap != null) {
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
                                     //上传发货方图片
                                     String uploadShipperurl = "";
-                                    uploadShipperServer(uploadShipperurl, strings[1], getBitmapPath(), imageBitmap);
+                                    uploadShipperServer(uploadShipperurl, carnum, getBitmapPath(), imageBitmap);
                                 }
                             }).start();
                         }
                     }
-                    iShipperView.showToast(o.getString("msg"));
+                    iShipperWriteView.showToast(o.getString("msg"));
 
 
                 } catch (JSONException e) {
@@ -194,7 +205,7 @@ public class ShipperPresenter extends Presenter {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                iShipperView.showToast("网络异常，请稍后再试");
+                iShipperWriteView.showToast("网络异常，请稍后再试");
 
             }
         });
@@ -266,7 +277,7 @@ public class ShipperPresenter extends Presenter {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        iShipperView.showToast("上传成功");
+                        iShipperWriteView.showToast("上传成功");
                     }
                 });
             }
