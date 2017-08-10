@@ -13,9 +13,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fxb.shipper.presenter.ShipperPresenter;
-import com.fxb.shipper.util.Sp;
-import com.fxb.shipper.view.IShipperView;
+import com.fxb.shipper.myapplication.presenter.ShipperPresenter;
+import com.fxb.shipper.myapplication.util.Sp;
+import com.fxb.shipper.myapplication.view.IShipperView;
+
 
 /**
  * Created by dxl on 2017-06-24.
@@ -155,6 +156,11 @@ public class ShipperWriteActivity extends Activity implements IShipperView {
     @Override
     public void finash() {
         finish();
+    }
+
+    @Override
+    public void setResult(String str) {
+        tv_resultView.setText(str);
     }
 
     @Override

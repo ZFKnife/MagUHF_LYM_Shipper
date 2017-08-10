@@ -3,7 +3,7 @@ package com.fxb.shipper.myapplication.model;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.fxb.shipper.util.DevBeep;
+import com.fxb.shipper.myapplication.util.DevBeep;
 import com.olc.uhf.tech.IUhfCallback;
 
 import java.util.Iterator;

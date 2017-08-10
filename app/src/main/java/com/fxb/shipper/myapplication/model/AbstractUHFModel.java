@@ -2,8 +2,8 @@ package com.fxb.shipper.myapplication.model;
 
 import android.util.Log;
 
-import com.fxb.shipper.application.App;
-import com.fxb.shipper.util.DevBeep;
+import com.fxb.shipper.myapplication.application.App;
+import com.fxb.shipper.myapplication.util.DevBeep;
 import com.olc.uhf.tech.ISO1800_6C;
 
 /**

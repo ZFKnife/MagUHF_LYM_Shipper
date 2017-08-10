@@ -6,11 +6,22 @@ package com.fxb.shipper.myapplication.view;
  */
 
 public interface IUHFViewBase {
-
+    /**
+     * 设置epc
+     * @param EPC
+     */
     public void setEPCtext(String EPC);
 
+    /**
+     * 显示吐司
+     * @param str
+     */
     public void showToast(String str);
 
+    /**
+     * 显示对话框
+     * @param str
+     */
     public void setDialog(String str);
 
 }

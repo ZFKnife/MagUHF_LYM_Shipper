@@ -4,11 +4,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.fxb.shipper.model.AbstractUHFModel;
-import com.fxb.shipper.model.IResponse;
-import com.fxb.shipper.model.ReadModel;
-import com.fxb.shipper.util.DevBeep;
-import com.fxb.shipper.view.IUHFViewBase;
+import com.fxb.shipper.myapplication.model.AbstractUHFModel;
+import com.fxb.shipper.myapplication.model.IResponse;
+import com.fxb.shipper.myapplication.model.ReadModel;
+import com.fxb.shipper.myapplication.util.DevBeep;
+import com.fxb.shipper.myapplication.view.IUHFViewBase;
 import com.olc.uhf.tech.ISO1800_6C;
 
 import java.io.UnsupportedEncodingException;
