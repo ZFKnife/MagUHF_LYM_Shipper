@@ -38,6 +38,7 @@ public class ShipperWriteActivity extends Activity implements IShipperWriteView 
     private Button btn_shipperWritting;
 
 
+
     private ShipperWritePresenter presenter = null;
 
 
@@ -72,6 +73,8 @@ public class ShipperWriteActivity extends Activity implements IShipperWriteView 
         btn_shipperReadEpc = (Button) findViewById(R.id.btn_shipper_readepc);
         btn_shipperReading = (Button) findViewById(R.id.btn_shipper_reading);
         btn_shipperWritting = (Button) findViewById(R.id.btn_shipper_writting);
+
+
 
     }
 

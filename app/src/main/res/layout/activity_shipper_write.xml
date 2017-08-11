@@ -227,24 +227,24 @@
 
             <Button
                 android:id="@+id/btn_shipper_reading"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="读标签"
                 android:textColor="@color/white"
-
                 android:textSize="18dp" />
 
             <Button
                 android:id="@+id/btn_shipper_writting"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="写标签"
                 android:textColor="@color/white"
                 android:textSize="18dp" />
+
         </LinearLayout>
     </LinearLayout>
 

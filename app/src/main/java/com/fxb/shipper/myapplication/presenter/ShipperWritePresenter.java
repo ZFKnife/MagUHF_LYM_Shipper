@@ -11,6 +11,8 @@ import com.fxb.shipper.myapplication.config.RequestConfig;
 import com.fxb.shipper.myapplication.util.Sp;
 import com.fxb.shipper.myapplication.util.Util;
 import com.fxb.shipper.myapplication.view.IShipperWriteView;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,6 +25,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
+
+import hardware.print.BarcodeUtil;
+import hardware.print.printer;
 
 /**
  * Created by Administrator on 2017/8/9 0009.
@@ -44,9 +49,13 @@ public class ShipperWritePresenter extends Presenter {
 
     private String carnum = null;
 
+    private printer mPrinter = new printer();
+
+
     public ShipperWritePresenter(IShipperWriteView iShipperWriteView) {
         super(iShipperWriteView);
         this.iShipperWriteView = iShipperWriteView;
+        mPrinter.Open();
     }
 
     public void readCarNum() {
@@ -194,8 +203,6 @@ public class ShipperWritePresenter extends Presenter {
                         }
                     }
                     iShipperWriteView.showToast(o.getString("msg"));
-
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -293,7 +300,78 @@ public class ShipperWritePresenter extends Presenter {
         return true;
     }
 
+    private void printe() {
+
+        mPrinter.PrintStringEx("卡的信息平台单据", 40, false, true, printer.PrintType.Centering);
+        mPrinter.PrintLineInit(20);
+        mPrinter.PrintLineString("发货方单据", 20, 210, false);
+        mPrinter.PrintLineEnd();
+        String str = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+        mPrinter.PrintLineInit(18);
+        mPrinter.PrintLineStringByType(str, 18, printer.PrintType.Centering, false);
+        mPrinter.PrintLineEnd();
+        mPrinter.PrintLineInit(25);
+        mPrinter.PrintLineStringByType("订单号：", 24, printer.PrintType.Left, true);
+        mPrinter.PrintLineString("18264861816135", 20, 210, false);
+        mPrinter.PrintLineEnd();
+        mPrinter.PrintLineInit(25);
+        mPrinter.PrintLineStringByType("发货方：", 24, printer.PrintType.Left, true);
+        mPrinter.PrintLineString(iShipperWriteView.getLocalhostName(), 20, 210, false);
+        mPrinter.PrintLineEnd();
+        mPrinter.PrintLineInit(25);
+        mPrinter.PrintLineStringByType("车牌号：", 24, printer.PrintType.Left, true);
+        mPrinter.PrintLineString(strings[1], 20, 210, false);
+        mPrinter.PrintLineEnd();
+        mPrinter.PrintLineInit(25);
+        mPrinter.PrintLineStringByType("货物名称：", 24, printer.PrintType.Left, true);
+        mPrinter.PrintLineString("电煤", 20, 210, false);
+        mPrinter.PrintLineEnd();
+        mPrinter.PrintLineInit(25);
+        mPrinter.PrintLineStringByType("毛重：", 24, printer.PrintType.Left, true);
+        mPrinter.PrintLineString(shipperMao, 20, 210, false);
+        mPrinter.PrintLineEnd();
+        mPrinter.PrintLineInit(25);
+        mPrinter.PrintLineStringByType("皮重：", 24, printer.PrintType.Left, true);
+        mPrinter.PrintLineString(shipperPi, 20, 210, false);
+        mPrinter.PrintLineEnd();
+        mPrinter.PrintLineInit(25);
+        mPrinter.PrintLineStringByType("净重：", 24, printer.PrintType.Left, true);
+        mPrinter.PrintLineString(shipperjing, 20, 210, false);
+        mPrinter.PrintLineEnd();
+        mPrinter.PrintLineInit(25);
+        mPrinter.PrintLineStringByType("打印时间：", 24, printer.PrintType.Left, true);
+        mPrinter.PrintLineString(Util.getTime(), 20, 210, false);
+        mPrinter.PrintLineEnd();
+        mPrinter.PrintLineInit(18);
+        mPrinter.PrintLineStringByType(str, 18, printer.PrintType.Centering, false);
+        mPrinter.PrintLineEnd();
+        Bitmap bm=null;
+        try {
+            bm = BarcodeUtil.encodeAsBitmap("Thanks for using our Android terminal",
+                    BarcodeFormat.QR_CODE, 160, 160);
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
+        if(bm!=null)
+        {
+            mPrinter.PrintBitmap(bm);
+        }
+        mPrinter.PrintLineInit(40);
+        mPrinter.PrintLineStringByType("", 24, printer.PrintType.Right, true);//160
+        mPrinter.PrintLineEnd();
+        mPrinter.printBlankLine(40);
+    }
+
+
+    public void Step() {
+        if (mPrinter == null) {
+            return;
+        }
+        mPrinter.Step((byte) 0x5f);
+    }
+
     public void cancel() {
+        mPrinter.Close();
         App.getRequestQueue().cancelAll(this);
     }
 
