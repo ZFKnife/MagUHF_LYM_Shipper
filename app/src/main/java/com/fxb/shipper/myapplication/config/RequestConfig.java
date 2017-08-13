@@ -7,9 +7,9 @@ package com.fxb.shipper.myapplication.config;
 
 public class RequestConfig {
 
-    private static String ip = "39.108.0.144";
+    private static String ip = "139.224.0.153";
 
-    private static String backPackage = "YJYNLogisticsSystem";
+    private static String backPackage = "LYMLogisticsSystem";
 
     private static String base = "http://" + ip + "/" + backPackage + "/";
 
@@ -17,7 +17,7 @@ public class RequestConfig {
 
     public static String getRealordShipper = base + "appPublishInformation?action=getRealordShipper&";
 
-    public static String uploadShipperurl = base + "";
+    public static String uploadShipperurl = base + "appUser/uploadShipperorder";
 
     public static String getShipperList = base + "appPublishInformation?action=getShipperList";
 

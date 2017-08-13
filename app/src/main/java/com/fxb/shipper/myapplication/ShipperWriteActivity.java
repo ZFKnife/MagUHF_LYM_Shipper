@@ -3,6 +3,7 @@ package com.fxb.shipper.myapplication;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
@@ -38,13 +39,13 @@ public class ShipperWriteActivity extends Activity implements IShipperWriteView 
     private Button btn_shipperWritting;
 
 
-
     private ShipperWritePresenter presenter = null;
 
 
     private ImageView imageView;
     private Bitmap imageBitmap;
     private Handler mHandler = new Handler();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +74,6 @@ public class ShipperWriteActivity extends Activity implements IShipperWriteView 
         btn_shipperReadEpc = (Button) findViewById(R.id.btn_shipper_readepc);
         btn_shipperReading = (Button) findViewById(R.id.btn_shipper_reading);
         btn_shipperWritting = (Button) findViewById(R.id.btn_shipper_writting);
-
-
 
     }
 
@@ -115,6 +114,7 @@ public class ShipperWriteActivity extends Activity implements IShipperWriteView 
             Bundle bundle = data.getExtras();
             imageBitmap = (Bitmap) bundle.get("data");
             assert imageBitmap != null;
+            imageView.setBackgroundColor(Color.parseColor("#FFFFFF"));
             imageView.setImageBitmap(imageBitmap);
         }
     }

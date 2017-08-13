@@ -2,18 +2,19 @@ package com.fxb.shipper.myapplication.presenter;
 
 import android.graphics.Bitmap;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.fxb.shipper.myapplication.application.App;
 import com.fxb.shipper.myapplication.config.RequestConfig;
-import com.fxb.shipper.myapplication.util.Sp;
 import com.fxb.shipper.myapplication.util.Util;
 import com.fxb.shipper.myapplication.view.IShipperWriteView;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -41,15 +43,18 @@ public class ShipperWritePresenter extends Presenter {
 
     private Bitmap imageBitmap = null;
 
-    private String shipperPi;
+    private String shipperPi = null;
 
-    private String shipperMao;
+    private String shipperMao = null;
 
-    private String shipperjing;
+    private String shipperjing = null;
 
     private String carnum = null;
 
     private printer mPrinter = new printer();
+
+    private String oradid = "";
+    private String cargo = "";
 
 
     public ShipperWritePresenter(IShipperWriteView iShipperWriteView) {
@@ -87,10 +92,7 @@ public class ShipperWritePresenter extends Presenter {
         shipperjing = df.format(d_weight_empty);
         sb.append(strings[0]).append(",");
         sb.append(strings[1]).append(",");
-        sb.append(shipperMao).append(",");
-        sb.append(shipperPi).append(",");
-        sb.append(shipperjing).append(",");
-        sb.append(Sp.getStrings(App.mContext, "name")).append(",");
+        sb.append(iShipperWriteView.getLocalhostName()).append(",");
         iShipperWriteView.setShipperJingText(shipperjing);
 //        writeTrue(sb.toString());
         //上传发货方信息 上传成功后写卡
@@ -102,15 +104,22 @@ public class ShipperWritePresenter extends Presenter {
         strings = str.split(",");
         iShipperWriteView.showToast("读取成功！");
         iShipperWriteView.setCarNumText(strings[1]);
-        carnum = URLEncoder.encode(strings[1].substring(0, 1)) + strings[1].substring(1);
-        iShipperWriteView.setResult(str);
-
+        try {
+            carnum = URLEncoder.encode(strings[1].substring(0, 1), "UTF-8") + strings[1].substring(1);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        if (str.substring(16, 17).equals("0")) {
+            iShipperWriteView.setResult(str.substring(0, 16));
+        } else {
+            iShipperWriteView.setResult(str);
+        }
         contrastShipper();
     }
 
     @Override
     void writeResponse() {
-        iShipperWriteView.showToast("写入成功！");
+//        iShipperWriteView.showToast("写入成功！");
         iShipperWriteView.setResult("完成");
     }
 
@@ -161,29 +170,18 @@ public class ShipperWritePresenter extends Presenter {
     /**
      * 上传发货方信息
      */
-    private void upShipperMeadData(String maoWeight, String piWeight, String jingWeight, final String sb) {
-        //上传计量数据
-            /*
-            * 参数说明
-            * 139.224.0.153：IP
-            * LYMistSystem：项目名
-            * appPublishInformation：类名
-            * upShipperMeasData：action
-            * CARDNUM：卡编号
-            * CARNUM：车牌号
-            * SHIPPERMAO：发货端毛重
-            * SHIPPERPI：发货端皮重
-            * SHIPPERJING：发货端净重
-            * */
+    private void upShipperMeadData(final String maoWeight, final String piWeight, String jingWeight, final String sb) {
         StringBuilder stringBuilder = new StringBuilder(RequestConfig.upShipperMeasData);
         stringBuilder.append("CARDNUM=").append(strings[0]);
         stringBuilder.append("&CARNUM=").append(carnum);
         stringBuilder.append("&SHIPPERMAO=").append(maoWeight);
         stringBuilder.append("&SHIPPERPI=").append(piWeight);
         stringBuilder.append("&SHIPPERJING=").append(jingWeight);
+        Log.i(" ---- ", "upShipperMeadData: " + stringBuilder.toString());
         StringRequest getContactRequest = new StringRequest(stringBuilder.toString(), new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
+                Log.i(" --- ", "onResponse: " + s);
                 if (TextUtils.isEmpty(s)) {
                     iShipperWriteView.showToast("服务器数据异常");
                     return;
@@ -191,15 +189,30 @@ public class ShipperWritePresenter extends Presenter {
                 try {
                     JSONObject o = new JSONObject(s);
                     if (o.getString("status").equals("0")) {
-                        writeTrue(sb);
+                        JSONArray ja = new JSONArray(o.getString("data"));
+                        JSONObject jo = new JSONObject(String.valueOf(ja.getJSONObject(0)));
+                        oradid = jo.getString("ordered");
+                        cargo = jo.getString("name");
+                        //打印票据
+                        printe();
+
+                        StringBuilder sb2 = new StringBuilder();
+                        sb2.append(sb);
+                        sb2.append(cargo).append(",");
+                        sb2.append(maoWeight).append(",");
+                        sb2.append(piWeight).append(",");
+                        final String data = sb2.toString();
+                        Log.i("---", "onResponse: " + data);
                         if (imageBitmap != null) {
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
                                     //上传发货方图片
-                                    uploadShipperServer(RequestConfig.uploadShipperurl, carnum, getBitmapPath(), imageBitmap);
+                                    uploadShipperServer(RequestConfig.uploadShipperurl, carnum, getBitmapPath(), imageBitmap, data);
                                 }
                             }).start();
+                        } else {
+                            writeTrue(data);
                         }
                     }
                     iShipperWriteView.showToast(o.getString("msg"));
@@ -211,7 +224,6 @@ public class ShipperWritePresenter extends Presenter {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 iShipperWriteView.showToast("网络异常，请稍后再试");
-
             }
         });
         getContactRequest.setTag(this);
@@ -236,7 +248,7 @@ public class ShipperWritePresenter extends Presenter {
      * @param bm
      * @return
      */
-    private boolean uploadShipperServer(String targetUrl, String carnum, String fileName, Bitmap bm) {
+    private boolean uploadShipperServer(String targetUrl, String carnum, String fileName, Bitmap bm, String sb) {
         String end = "\r\n";
         String twoHyphens = "--";
         String boundary = "******";
@@ -285,6 +297,7 @@ public class ShipperWritePresenter extends Presenter {
                         iShipperWriteView.showToast("上传成功");
                     }
                 });
+                writeTrue(sb);
             }
             dos.close();
             is.close();
@@ -300,7 +313,31 @@ public class ShipperWritePresenter extends Presenter {
         return true;
     }
 
-    private void printe() {
+    public void printe() {
+        if (oradid.equals("")) {
+            iShipperWriteView.showToast("请先写卡");
+            return;
+        }
+        if (cargo.equals("")) {
+            iShipperWriteView.showToast("请先写卡");
+            return;
+        }
+        if (strings == null) {
+            iShipperWriteView.showToast("请先读卡");
+            return;
+        }
+        if (shipperMao == null) {
+            iShipperWriteView.showToast("请先读卡");
+            return;
+        }
+        if (shipperPi == null) {
+            iShipperWriteView.showToast("请先读卡");
+            return;
+        }
+        if (shipperjing == null) {
+            iShipperWriteView.showToast("请先读卡");
+            return;
+        }
 
         mPrinter.PrintStringEx("卡的信息平台单据", 40, false, true, printer.PrintType.Centering);
         mPrinter.PrintLineInit(20);
@@ -312,7 +349,7 @@ public class ShipperWritePresenter extends Presenter {
         mPrinter.PrintLineEnd();
         mPrinter.PrintLineInit(25);
         mPrinter.PrintLineStringByType("订单号：", 24, printer.PrintType.Left, true);
-        mPrinter.PrintLineString("18264861816135", 20, 210, false);
+        mPrinter.PrintLineString(oradid, 20, 200, false);
         mPrinter.PrintLineEnd();
         mPrinter.PrintLineInit(25);
         mPrinter.PrintLineStringByType("发货方：", 24, printer.PrintType.Left, true);
@@ -320,48 +357,62 @@ public class ShipperWritePresenter extends Presenter {
         mPrinter.PrintLineEnd();
         mPrinter.PrintLineInit(25);
         mPrinter.PrintLineStringByType("车牌号：", 24, printer.PrintType.Left, true);
-        mPrinter.PrintLineString(strings[1], 20, 210, false);
+        mPrinter.PrintLineString(strings[1], 20, 200, false);
         mPrinter.PrintLineEnd();
         mPrinter.PrintLineInit(25);
         mPrinter.PrintLineStringByType("货物名称：", 24, printer.PrintType.Left, true);
-        mPrinter.PrintLineString("电煤", 20, 210, false);
+        mPrinter.PrintLineString(cargo, 20, 200, false);
         mPrinter.PrintLineEnd();
         mPrinter.PrintLineInit(25);
         mPrinter.PrintLineStringByType("毛重：", 24, printer.PrintType.Left, true);
-        mPrinter.PrintLineString(shipperMao, 20, 210, false);
+        mPrinter.PrintLineString(shipperMao, 20, 200, false);
         mPrinter.PrintLineEnd();
         mPrinter.PrintLineInit(25);
         mPrinter.PrintLineStringByType("皮重：", 24, printer.PrintType.Left, true);
-        mPrinter.PrintLineString(shipperPi, 20, 210, false);
+        mPrinter.PrintLineString(shipperPi, 20, 200, false);
         mPrinter.PrintLineEnd();
         mPrinter.PrintLineInit(25);
         mPrinter.PrintLineStringByType("净重：", 24, printer.PrintType.Left, true);
-        mPrinter.PrintLineString(shipperjing, 20, 210, false);
+        mPrinter.PrintLineString(shipperjing, 20, 200, false);
         mPrinter.PrintLineEnd();
         mPrinter.PrintLineInit(25);
         mPrinter.PrintLineStringByType("打印时间：", 24, printer.PrintType.Left, true);
-        mPrinter.PrintLineString(Util.getTime(), 20, 210, false);
+        mPrinter.PrintLineString(Util.getTime(), 20, 200, false);
         mPrinter.PrintLineEnd();
         mPrinter.PrintLineInit(18);
         mPrinter.PrintLineStringByType(str, 18, printer.PrintType.Centering, false);
         mPrinter.PrintLineEnd();
-        Bitmap bm=null;
+        Bitmap bm = null;
         try {
             bm = BarcodeUtil.encodeAsBitmap("Thanks for using our Android terminal",
                     BarcodeFormat.QR_CODE, 160, 160);
         } catch (WriterException e) {
             e.printStackTrace();
         }
-        if(bm!=null)
-        {
+        if (bm != null) {
             mPrinter.PrintBitmap(bm);
         }
         mPrinter.PrintLineInit(40);
         mPrinter.PrintLineStringByType("", 24, printer.PrintType.Right, true);//160
         mPrinter.PrintLineEnd();
         mPrinter.printBlankLine(40);
+        clear();
     }
 
+    private void clear() {
+        oradid = "";
+        strings = null;
+        cargo = "";
+        shipperMao = null;
+        shipperPi = null;
+        shipperjing = null;
+        abstractUHFModel.clear();
+        iShipperWriteView.setEPCtext("");
+        iShipperWriteView.setCarNumText("");
+        iShipperWriteView.setShipperJingText("");
+        iShipperWriteView.setShipperJingText("");
+        iShipperWriteView.showToast("数据写入完成，可进行下一业务操作！");
+    }
 
     public void Step() {
         if (mPrinter == null) {

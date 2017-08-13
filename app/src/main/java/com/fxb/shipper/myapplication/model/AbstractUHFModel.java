@@ -163,4 +163,7 @@ public abstract class AbstractUHFModel {
         return uhf_6c.getErrorDescription(code);
     }
 
+    public void clear() {
+        byteEpc = null;
+    }
 }
