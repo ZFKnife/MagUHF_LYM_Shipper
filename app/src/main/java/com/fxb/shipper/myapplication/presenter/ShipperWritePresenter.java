@@ -109,8 +109,12 @@ public class ShipperWritePresenter extends Presenter {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        if (str.substring(16, 17).equals("0")) {
+        int length = strings.length - 1;
+        int msc = Integer.parseInt(strings[length]);
+        if (str.substring(18, 19).equals("0")) {
             iShipperWriteView.setResult(str.substring(0, 16));
+        } else if (msc == 0) {
+            iShipperWriteView.setResult(str.replace(strings[length], ""));
         } else {
             iShipperWriteView.setResult(str);
         }
@@ -193,9 +197,6 @@ public class ShipperWritePresenter extends Presenter {
                         JSONObject jo = new JSONObject(String.valueOf(ja.getJSONObject(0)));
                         oradid = jo.getString("ordered");
                         cargo = jo.getString("name");
-                        //打印票据
-                        printe();
-
                         StringBuilder sb2 = new StringBuilder();
                         sb2.append(sb);
                         sb2.append(cargo).append(",");
@@ -214,6 +215,7 @@ public class ShipperWritePresenter extends Presenter {
                         } else {
                             writeTrue(data);
                         }
+                        printe();
                     }
                     iShipperWriteView.showToast(o.getString("msg"));
                 } catch (JSONException e) {
@@ -341,7 +343,7 @@ public class ShipperWritePresenter extends Presenter {
 
         mPrinter.PrintStringEx("卡的信息平台单据", 40, false, true, printer.PrintType.Centering);
         mPrinter.PrintLineInit(20);
-        mPrinter.PrintLineString("发货方单据", 20, 210, false);
+        mPrinter.PrintLineString("发货方单据", 20, 200, false);
         mPrinter.PrintLineEnd();
         String str = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
         mPrinter.PrintLineInit(18);
@@ -353,7 +355,7 @@ public class ShipperWritePresenter extends Presenter {
         mPrinter.PrintLineEnd();
         mPrinter.PrintLineInit(25);
         mPrinter.PrintLineStringByType("发货方：", 24, printer.PrintType.Left, true);
-        mPrinter.PrintLineString(iShipperWriteView.getLocalhostName(), 20, 210, false);
+        mPrinter.PrintLineString(iShipperWriteView.getLocalhostName(), 20, 200, false);
         mPrinter.PrintLineEnd();
         mPrinter.PrintLineInit(25);
         mPrinter.PrintLineStringByType("车牌号：", 24, printer.PrintType.Left, true);
@@ -365,15 +367,15 @@ public class ShipperWritePresenter extends Presenter {
         mPrinter.PrintLineEnd();
         mPrinter.PrintLineInit(25);
         mPrinter.PrintLineStringByType("毛重：", 24, printer.PrintType.Left, true);
-        mPrinter.PrintLineString(shipperMao, 20, 200, false);
+        mPrinter.PrintLineString(shipperMao + "吨", 20, 200, false);
         mPrinter.PrintLineEnd();
         mPrinter.PrintLineInit(25);
         mPrinter.PrintLineStringByType("皮重：", 24, printer.PrintType.Left, true);
-        mPrinter.PrintLineString(shipperPi, 20, 200, false);
+        mPrinter.PrintLineString(shipperPi + "吨", 20, 200, false);
         mPrinter.PrintLineEnd();
         mPrinter.PrintLineInit(25);
         mPrinter.PrintLineStringByType("净重：", 24, printer.PrintType.Left, true);
-        mPrinter.PrintLineString(shipperjing, 20, 200, false);
+        mPrinter.PrintLineString(shipperjing + "吨", 20, 200, false);
         mPrinter.PrintLineEnd();
         mPrinter.PrintLineInit(25);
         mPrinter.PrintLineStringByType("打印时间：", 24, printer.PrintType.Left, true);
