@@ -49,4 +49,6 @@ public interface IShipperWriteView extends IUHFViewBase {
      * 设置反馈信息
      */
     public void setResult(String str);
+
+    public void setVisite(boolean b);
 }

@@ -243,6 +243,32 @@
                 android:textSize="18dp" />
 
         </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_printer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="打印发票"
+                android:textColor="@color/white"
+                android:textSize="18dp" />
+
+            <Button
+                android:id="@+id/btn_zouzhi"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="走纸"
+                android:textColor="@color/white"
+                android:textSize="18dp" />
+
+        </LinearLayout>
     </LinearLayout>
 
 </RelativeLayout>

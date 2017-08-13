@@ -37,6 +37,8 @@ public class ShipperWriteActivity extends Activity implements IShipperWriteView 
     private Button btn_shipperReadEpc;
     private Button btn_shipperReading;
     private Button btn_shipperWritting;
+    private Button btnPrinter;
+    private Button btnZouzhi;
 
 
     private ShipperWritePresenter presenter = null;
@@ -74,6 +76,8 @@ public class ShipperWriteActivity extends Activity implements IShipperWriteView 
         btn_shipperReadEpc = (Button) findViewById(R.id.btn_shipper_readepc);
         btn_shipperReading = (Button) findViewById(R.id.btn_shipper_reading);
         btn_shipperWritting = (Button) findViewById(R.id.btn_shipper_writting);
+        btnPrinter = (Button) findViewById(R.id.btn_printer);
+        btnZouzhi = (Button) findViewById(R.id.btn_zouzhi);
 
     }
 
@@ -94,6 +98,18 @@ public class ShipperWriteActivity extends Activity implements IShipperWriteView 
             @Override
             public void onClick(View v) {
                 presenter.writeShipper();
+            }
+        });
+        btnPrinter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                presenter.printe();
+            }
+        });
+        btnZouzhi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                presenter.Step();
             }
         });
         imageView.setOnClickListener(new View.OnClickListener() {
@@ -167,6 +183,12 @@ public class ShipperWriteActivity extends Activity implements IShipperWriteView 
     @Override
     public void setResult(String str) {
         tv_resultView.setText(str);
+    }
+
+    @Override
+    public void setVisite(boolean b) {
+        btnPrinter.setEnabled(b);
+        btnPrinter.setClickable(b);
     }
 
     @Override

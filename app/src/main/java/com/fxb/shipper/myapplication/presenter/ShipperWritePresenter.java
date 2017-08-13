@@ -60,6 +60,7 @@ public class ShipperWritePresenter extends Presenter {
     public ShipperWritePresenter(IShipperWriteView iShipperWriteView) {
         super(iShipperWriteView);
         this.iShipperWriteView = iShipperWriteView;
+        iShipperWriteView.setVisite(false);
         mPrinter.Open();
     }
 
@@ -110,7 +111,10 @@ public class ShipperWritePresenter extends Presenter {
             e.printStackTrace();
         }
         int length = strings.length - 1;
-        int msc = Integer.parseInt(strings[length]);
+        int msc = -1;
+        if (length > 5) {
+            msc = Integer.parseInt(strings[length]);
+        }
         if (str.substring(18, 19).equals("0")) {
             iShipperWriteView.setResult(str.substring(0, 16));
         } else if (msc == 0) {
@@ -203,6 +207,7 @@ public class ShipperWritePresenter extends Presenter {
                         sb2.append(maoWeight).append(",");
                         sb2.append(piWeight).append(",");
                         final String data = sb2.toString();
+                        iShipperWriteView.setVisite(true);
                         Log.i("---", "onResponse: " + data);
                         if (imageBitmap != null) {
                             new Thread(new Runnable() {
@@ -215,7 +220,6 @@ public class ShipperWritePresenter extends Presenter {
                         } else {
                             writeTrue(data);
                         }
-                        printe();
                     }
                     iShipperWriteView.showToast(o.getString("msg"));
                 } catch (JSONException e) {
@@ -413,6 +417,7 @@ public class ShipperWritePresenter extends Presenter {
         iShipperWriteView.setCarNumText("");
         iShipperWriteView.setShipperJingText("");
         iShipperWriteView.setShipperJingText("");
+        iShipperWriteView.setVisite(false);
         iShipperWriteView.showToast("数据写入完成，可进行下一业务操作！");
     }
 
