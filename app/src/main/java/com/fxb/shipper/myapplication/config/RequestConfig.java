@@ -17,7 +17,7 @@ public class RequestConfig {
 
     public static String getRealordShipper = base + "appPublishInformation?action=getRealordShipper&";
 
-    public static String uploadShipperurl = base + "appUser/uploadShipperorder";
+    public static String uploadShipperurl = base + "appUser?action=uploadShipperorder";
 
     public static String getShipperList = base + "appPublishInformation?action=getShipperList";
 

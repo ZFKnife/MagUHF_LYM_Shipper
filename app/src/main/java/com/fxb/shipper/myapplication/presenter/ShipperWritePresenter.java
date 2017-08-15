@@ -209,12 +209,14 @@ public class ShipperWritePresenter extends Presenter {
                         final String data = sb2.toString();
                         iShipperWriteView.setVisite(true);
                         Log.i("---", "onResponse: " + data);
+                        imageBitmap = iShipperWriteView.getBitmap();
                         if (imageBitmap != null) {
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
                                     //上传发货方图片
-                                    uploadShipperServer(RequestConfig.uploadShipperurl, carnum, getBitmapPath(), imageBitmap, data);
+                                    Log.i(" ------ ", "run:  start ");
+                                    uploadShipperServer(RequestConfig.uploadShipperurl, oradid, getBitmapPath(), imageBitmap, data);
                                 }
                             }).start();
                         } else {
@@ -242,25 +244,26 @@ public class ShipperWritePresenter extends Presenter {
      * @return
      */
     private String getBitmapPath() {
-        return "shipper" + System.currentTimeMillis() + ".jpg";
+        return "shipper.jpg";
     }
 
     /**
      * 上传图片
      *
      * @param targetUrl
-     * @param carnum
+     * @param ORDERNUM
      * @param fileName
      * @param bm
      * @return
      */
-    private boolean uploadShipperServer(String targetUrl, String carnum, String fileName, Bitmap bm, String sb) {
+    private boolean uploadShipperServer(String targetUrl, String ORDERNUM, String fileName, Bitmap bm, String sb) {
         String end = "\r\n";
         String twoHyphens = "--";
         String boundary = "******";
         HttpURLConnection httpURLConnection = null;
         try {
             URL url = new URL(targetUrl);
+            Log.i(" ----- ", "uploadShipperServer: url is "+targetUrl);
             httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setConnectTimeout(10000);
             httpURLConnection.setChunkedStreamingMode(128 * 1024);// 128K
@@ -277,16 +280,16 @@ public class ShipperWritePresenter extends Presenter {
 
             DataOutputStream dos = new DataOutputStream(httpURLConnection.getOutputStream());
             dos.writeBytes(twoHyphens + boundary + end);
-            dos.writeBytes("Content-Disposition: form-data; name=\"CARNUM\"" + end);
+            dos.writeBytes("Content-Disposition: form-data; name=\"ORDERNUM\"" + end);
             dos.writeBytes(end);
-            dos.writeBytes(carnum + end);
+            dos.writeBytes(ORDERNUM + end);
 
             dos.writeBytes(twoHyphens + boundary + end);
             dos.writeBytes("Content-Disposition: form-data; name=\"imagePath\"; filename=\"" + fileName + "\"" + end);
             dos.writeBytes(end);
-
             dos.write(Util.Bitmap2Bytes(bm));
             dos.writeBytes(end);
+
             dos.writeBytes(twoHyphens + boundary + twoHyphens + end);
             dos.flush();
 

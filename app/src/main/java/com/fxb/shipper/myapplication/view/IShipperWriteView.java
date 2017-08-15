@@ -1,5 +1,7 @@
 package com.fxb.shipper.myapplication.view;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by Administrator on 2017/8/9 0009.
  */
@@ -51,4 +53,6 @@ public interface IShipperWriteView extends IUHFViewBase {
     public void setResult(String str);
 
     public void setVisite(boolean b);
+
+    public Bitmap getBitmap();
 }

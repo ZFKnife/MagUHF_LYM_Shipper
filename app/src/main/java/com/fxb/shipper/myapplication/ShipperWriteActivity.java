@@ -192,6 +192,14 @@ public class ShipperWriteActivity extends Activity implements IShipperWriteView 
     }
 
     @Override
+    public Bitmap getBitmap() {
+        if (imageBitmap == null) {
+            return null;
+        }
+        return imageBitmap;
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         presenter.cancel();
