@@ -207,7 +207,11 @@ public class ShipperWritePresenter extends Presenter {
                         sb2.append(maoWeight).append(",");
                         sb2.append(piWeight).append(",");
                         final String data = sb2.toString();
+
+
                         iShipperWriteView.setVisite(true);
+
+
                         Log.i("---", "onResponse: " + data);
                         imageBitmap = iShipperWriteView.getBitmap();
                         if (imageBitmap != null) {
@@ -263,7 +267,7 @@ public class ShipperWritePresenter extends Presenter {
         HttpURLConnection httpURLConnection = null;
         try {
             URL url = new URL(targetUrl);
-            Log.i(" ----- ", "uploadShipperServer: url is "+targetUrl);
+            Log.i(" ----- ", "uploadShipperServer: url is " + targetUrl);
             httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setConnectTimeout(10000);
             httpURLConnection.setChunkedStreamingMode(128 * 1024);// 128K

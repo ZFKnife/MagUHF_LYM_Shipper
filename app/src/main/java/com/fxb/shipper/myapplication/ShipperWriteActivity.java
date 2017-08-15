@@ -188,7 +188,6 @@ public class ShipperWriteActivity extends Activity implements IShipperWriteView 
     @Override
     public void setVisite(boolean b) {
         btnPrinter.setEnabled(b);
-        btnPrinter.setClickable(b);
     }
 
     @Override
@@ -202,6 +201,11 @@ public class ShipperWriteActivity extends Activity implements IShipperWriteView 
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         presenter.cancel();
     }
 }
