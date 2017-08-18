@@ -110,17 +110,11 @@ public class ShipperWritePresenter extends Presenter {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        int length = strings.length - 1;
-        int msc = -1;
-        if (length > 5) {
-            msc = Integer.parseInt(strings[length]);
-        }
+        int length = strings.length;
         if (str.substring(18, 19).equals("0")) {
             iShipperWriteView.setResult(str.substring(0, 16));
-        } else if (msc == 0) {
-            iShipperWriteView.setResult(str.replace(strings[length], ""));
-        } else {
-            iShipperWriteView.setResult(str);
+        } else if (length > 6) {
+            iShipperWriteView.setResult(str.replace(strings[length - 1], ""));
         }
         contrastShipper();
     }
